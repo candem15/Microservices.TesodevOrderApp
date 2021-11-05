@@ -11,6 +11,7 @@ namespace CustomerService.Data
         bool SaveChanges();
         IEnumerable<Customer> GetAllCustomers();
         Customer GetCustomerById(Guid id);
+        /*IEnumerable<Address> GetAdressesByCustomerId(Guid id);""Test Purposes"" */
         bool CreateCustomer(Customer customer);
         bool UpdateCustomer(Customer customer);
         bool DeleteCustomer(Guid id);

@@ -14,16 +14,13 @@ namespace CustomerService.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .Entity<Customer>()
-                .HasMany(p => p.Addresses)
-                .WithOne(p => p.Customer)
-                .HasForeignKey(p => p.CustomerId);
-
-            modelBuilder
                 .Entity<Address>()
                 .HasOne(p => p.Customer)
-                .WithMany(p => p.Addresses)
-                .HasForeignKey(p => p.CustomerId);
+                .WithMany(b => b.Addresses);
+            modelBuilder
+                .Entity<Customer>()
+                .HasMany(p => p.Addresses)
+                .WithOne(b => b.Customer);
         }
     }
 }

@@ -52,6 +52,12 @@ namespace CustomerService.Data
             return _context.Customers.FirstOrDefault(p => p.Id == id);
         }
 
+        /* public IEnumerable<Address> GetAdressesByCustomerId(Guid id) ""Test purposes""
+        {
+            return _context.Addresses.Where(p => p.CustomerId == id).OrderBy(c=>c.City);
+        }
+        */
+
         public bool SaveChanges()
         {
             return (_context.SaveChanges() >= 0); //This will apply changes even slightly different from previous version of itself.
