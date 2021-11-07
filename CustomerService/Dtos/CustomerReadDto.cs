@@ -11,7 +11,7 @@ namespace CustomerService.Dtos
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public ICollection<Address> Address { get; set; } = new List<Address>();
+        public ICollection<Address> Addresses { get; set; } = new List<Address>();
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

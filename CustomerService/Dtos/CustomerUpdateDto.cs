@@ -9,13 +9,8 @@ namespace CustomerService.Dtos
 {
     public class CustomerUpdateDto
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
         public string Email { get; set; }
-        [Required]
-        public ICollection<Address> Address { get; set; } = new List<Address>();
-        [Required]
-        public DateTime CreatedAt { get; set; }
+        public Address Addresses { get; set; }
     }
 }

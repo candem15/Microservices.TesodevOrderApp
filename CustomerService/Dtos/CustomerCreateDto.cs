@@ -14,10 +14,6 @@ namespace CustomerService.Dtos
         [Required]
         public string Email { get; set; }
         [Required]
-        public ICollection<Address> Address { get; set; } = new List<Address>();
-        [Required]
-        public DateTime CreatedAt { get; set; }
-        [Required]
-        public DateTime UpdatedAt { get; set; }
+        public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
 }

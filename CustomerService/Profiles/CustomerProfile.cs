@@ -15,6 +15,12 @@ namespace CustomerService.Profiles
             // Source to Target
             CreateMap<Customer,CustomerReadDto>();
             CreateMap<CustomerCreateDto,Customer>();
+            CreateMap<CustomerUpdateDto,Customer>();
+            CreateMap<Customer, Address>()
+                .ForMember(
+                    destinationMember => destinationMember.Customer,
+                    memberOption => memberOption.MapFrom(
+                        sourceMember => sourceMember.Id));
          }
     }
 }

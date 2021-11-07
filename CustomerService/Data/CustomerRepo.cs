@@ -23,7 +23,10 @@ namespace CustomerService.Data
                 Console.WriteLine($"--> Customer could not created : {nullException}");
                 return false;
             }
+            customer.CreatedAt=DateTime.Now;
+            customer.UpdatedAt=DateTime.Now;
             _context.Customers.Add(customer);
+            _context.Addresses.AddRange(customer.Addresses);
             SaveChanges();
             Console.WriteLine("--> New Customer created successfully!");
             return true;
@@ -63,13 +66,17 @@ namespace CustomerService.Data
             return (_context.SaveChanges() >= 0); //This will apply changes even slightly different from previous version of itself.
         }
 
-        public bool UpdateCustomer(Customer customer)
+        public bool UpdateCustomer(Customer customer, Address? address)
         {
             if (!ValidateCustomer(customer.Id))
             {
                 return false;
             }
             _context.Customers.Update(customer);
+            if(address!=null)
+            {
+            _context.Addresses.Update(address);
+            }
             SaveChanges();
             Console.WriteLine("--> Customer updated successfully!");
             return true;

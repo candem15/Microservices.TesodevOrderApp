@@ -5,6 +5,7 @@ using AutoMapper;
 using CustomerService.Data;
 using CustomerService.Dtos;
 using CustomerService.Models;
+using CustomerService.SyncDataServices.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerService.Controllers
@@ -14,11 +15,13 @@ namespace CustomerService.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly IMapper _mapper;
+        private readonly IOrderDataClient _orderDataClient;
         private readonly ICustomerRepo _repository;
-        public CustomerController(ICustomerRepo repository, IMapper mapper)
+        public CustomerController(ICustomerRepo repository, IMapper mapper, IOrderDataClient orderDataClient)
         {
             _repository = repository;
             _mapper = mapper;
+            _orderDataClient = orderDataClient;
         }
 
         [HttpGet]
@@ -45,13 +48,22 @@ namespace CustomerService.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CustomerReadDto> CreateCustomer(CustomerCreateDto customerCreateDto)
+        public async Task<ActionResult<CustomerReadDto>> CreateCustomer(CustomerCreateDto customerCreateDto)
         {
             Console.WriteLine("--> New customer created!");
             var customerModel = _mapper.Map<Customer>(customerCreateDto);
             _repository.CreateCustomer(customerModel);
 
             var customerReadDto = _mapper.Map<CustomerReadDto>(customerModel);
+
+            try
+            {
+                await _orderDataClient.SendCustomerToOrder(customerReadDto);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"--> Could not send synchronously: {exception.Message}");
+            }
 
             return CreatedAtRoute(nameof(GetCustomerById), new { Id = customerReadDto.Id }, customerReadDto); //This returns "201" with body payload of platformReadDto and Id as response.
         }
@@ -61,7 +73,7 @@ namespace CustomerService.Controllers
         {
             var existingCustomer = _repository.GetCustomerById(id); // Find existing customer from repository.
 
-            if(existingCustomer==null)
+            if (existingCustomer == null)
             {
                 return NotFound();
             }
@@ -77,16 +89,16 @@ namespace CustomerService.Controllers
         {
             var existingCustomer = _repository.GetCustomerById(id);
 
-            if(existingCustomer==null)
+            if (existingCustomer == null)
             {
                 return NotFound();
             }
-            existingCustomer.Name=customerUpdateDto.Name;
-            existingCustomer.Email=customerUpdateDto.Email;
-            existingCustomer.CreatedAt=customerUpdateDto.CreatedAt;
-            existingCustomer.UpdatedAt=DateTime.Now;
-            _repository.UpdateCustomer(existingCustomer);
-
+            existingCustomer.Name = customerUpdateDto.Name;
+            existingCustomer.Email = customerUpdateDto.Email;
+            existingCustomer.UpdatedAt = DateTime.Now;
+            if(customerUpdateDto.Addresses!=null)
+            _repository.UpdateCustomer(existingCustomer,customerUpdateDto.Addresses);
+            _repository.UpdateCustomer(existingCustomer,null);
             return NoContent();
         }
         /*[HttpGet("address/{id}", Name = "GetAdressesByCustomerId")] ""Test Purposes""
