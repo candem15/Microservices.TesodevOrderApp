@@ -15,21 +15,20 @@ namespace CustomerService.Data
         {
             _context = context;
         }
-        public bool CreateCustomer(Customer customer)
+        public Guid CreateCustomer(Customer customer)
         {
             if (customer == null)
             {
                 string nullException = new ArgumentNullException(nameof(customer)).ToString();
                 Console.WriteLine($"--> Customer could not created : {nullException}");
-                return false;
+                return Guid.Empty;
             }
             customer.CreatedAt=DateTime.Now;
             customer.UpdatedAt=DateTime.Now;
             _context.Customers.Add(customer);
             _context.Addresses.AddRange(customer.Addresses);
             SaveChanges();
-            Console.WriteLine("--> New Customer created successfully!");
-            return true;
+            return customer.Id;
         }
 
         public bool DeleteCustomer(Guid id)
@@ -84,12 +83,7 @@ namespace CustomerService.Data
 
         public bool ValidateCustomer(Guid id)
         {
-            var customer = _context.Customers.FirstOrDefault(p => p.Id == id);
-            if(customer!=null)
-            {
-                return true;
-            }
-            return false;
+            return _context.Customers.Any(p => p.Id == id);
         }
     }
 }

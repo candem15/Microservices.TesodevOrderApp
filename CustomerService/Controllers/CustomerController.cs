@@ -50,10 +50,10 @@ namespace CustomerService.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomerReadDto>> CreateCustomer(CustomerCreateDto customerCreateDto)
         {
-            Console.WriteLine("--> New customer created!");
             var customerModel = _mapper.Map<Customer>(customerCreateDto);
-            _repository.CreateCustomer(customerModel);
-
+            var customerId = _repository.CreateCustomer(customerModel);
+            if (customerId != null)
+                Console.WriteLine($"--> New customer created with Id: {customerId}");
             var customerReadDto = _mapper.Map<CustomerReadDto>(customerModel);
 
             try
@@ -78,7 +78,6 @@ namespace CustomerService.Controllers
                 return NotFound();
             }
 
-            Console.WriteLine("--> Customer deleted!");
             _repository.DeleteCustomer(id);
 
             return NoContent();
@@ -96,9 +95,9 @@ namespace CustomerService.Controllers
             existingCustomer.Name = customerUpdateDto.Name;
             existingCustomer.Email = customerUpdateDto.Email;
             existingCustomer.UpdatedAt = DateTime.Now;
-            if(customerUpdateDto.Addresses!=null)
-            _repository.UpdateCustomer(existingCustomer,customerUpdateDto.Addresses);
-            _repository.UpdateCustomer(existingCustomer,null);
+            if (customerUpdateDto.Addresses != null)
+                _repository.UpdateCustomer(existingCustomer, customerUpdateDto.Addresses);
+            _repository.UpdateCustomer(existingCustomer, null);
             return NoContent();
         }
         /*[HttpGet("address/{id}", Name = "GetAdressesByCustomerId")] ""Test Purposes""
