@@ -31,7 +31,7 @@ namespace CustomerService
         {
             Console.WriteLine("--> Sql Server using...");
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("PlatformSqlConnection")));
+                    options.UseSqlServer(Configuration.GetConnectionString("CustomerServiceSqlConnection")));
 
             services.AddScoped<ICustomerRepo,CustomerRepo>();
 

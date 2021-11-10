@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace OrderService.Models
@@ -7,7 +8,7 @@ namespace OrderService.Models
     {
         [Key]
         [Required]
-        public Guid Id { get; set; }
+        public Guid AddressesId { get; set; }
         public string AddressLine { get; set; }
         [Required]
         public string City { get; set; }
@@ -16,6 +17,6 @@ namespace OrderService.Models
         [Required]
         public int CityCode { get; set; }
         public Customer Customer { get; set; }
-        public Order Order { get; set; }
+        public ICollection<Order> Order { get; set; } = new List<Order>();
     }
 }

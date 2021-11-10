@@ -10,6 +10,8 @@ namespace OrderService.Dtos
     public class OrderCreateDto
     {
         [Required]
+        public Guid CustomerId { get; set; }
+        [Required]
         public int Quantity { get; set; }
         [Required]
         public double Price { get; set; }

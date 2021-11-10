@@ -15,6 +15,6 @@ namespace OrderService.Models
         public string ImageUrl { get; set; }
         [Required]
         public string Name { get; set; }
-        public Order Order { get; set; }
+        public ICollection<Order> Order { get; set; } = new List<Order>();
     }
 }

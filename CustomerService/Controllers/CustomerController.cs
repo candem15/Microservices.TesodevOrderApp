@@ -71,16 +71,9 @@ namespace CustomerService.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteCustomer(Guid id)
         {
-            var existingCustomer = _repository.GetCustomerById(id); // Find existing customer from repository.
-
-            if (existingCustomer == null)
-            {
-                return NotFound();
-            }
-
-            _repository.DeleteCustomer(id);
-
-            return NoContent();
+            if (_repository.DeleteCustomer(id))
+                return NoContent();
+            return NotFound();
         }
 
         [HttpPut("{id}")]

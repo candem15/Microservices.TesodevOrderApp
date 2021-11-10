@@ -22,7 +22,11 @@ namespace OrderService.Data
             modelBuilder
                 .Entity<Order>()
                 .HasOne(p => p.Addresses)
-                .WithOne(b => b.Order);
+                .WithMany(b => b.Order);
+            modelBuilder
+                .Entity<Address>()
+                .HasMany(p => p.Order)
+                .WithOne(b => b.Addresses);
             modelBuilder
                 .Entity<Customer>()
                 .HasMany(p => p.Orders)
@@ -36,7 +40,11 @@ namespace OrderService.Data
             modelBuilder
                 .Entity<Order>()
                 .HasOne(p => p.Products)
-                .WithOne(b => b.Order);
+                .WithMany(b => b.Order);
+            modelBuilder
+                .Entity<Product>()
+                .HasMany(p => p.Order)
+                .WithOne(b => b.Products);
         }
     }
 }
