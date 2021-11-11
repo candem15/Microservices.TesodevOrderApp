@@ -91,12 +91,18 @@ namespace OrderService.Controllers
             }
             existingOrder.Price = orderUpdateDto.Price;
             existingOrder.Quantity = orderUpdateDto.Quantity;
-            existingOrder.Products = orderUpdateDto.Products;
+            existingOrder.Address = orderUpdateDto.Address;
             existingOrder.UpdatedAt = DateTime.Now;
 
-            if (orderUpdateDto.Products != null)
-                _repository.UpdateOrder(existingOrder, orderUpdateDto.Products);
-            _repository.UpdateOrder(existingOrder, null);
+            if (orderUpdateDto.Product != null)
+            {
+                existingOrder.Product = orderUpdateDto.Product;
+            }
+            if (orderUpdateDto.Address != null)
+            {
+                existingOrder.Address = orderUpdateDto.Address;
+            }
+            _repository.UpdateOrder(existingOrder);
 
             return NoContent();
         }
@@ -106,7 +112,7 @@ namespace OrderService.Controllers
         {
             var status = JsonConvert.DeserializeObject<string>(orderUpdateDto.Status);
 
-            if(_repository.ChangeStatus(id,status))
+            if (_repository.ChangeStatus(id, status))
                 return GetOrderById(id);
 
             return BadRequest();

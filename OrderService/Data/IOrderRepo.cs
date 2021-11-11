@@ -13,7 +13,7 @@ namespace OrderService.Data
         IEnumerable<Order> GetAllOrdersByCustomerId(Guid id);
         Order GetOrderById(Guid id);
         Guid CreateOrder(Order order);
-        bool UpdateOrder(Order order, Product? product);
+        bool UpdateOrder(Order order);
         bool DeleteOrder(Guid id);
         bool ChangeStatus(Guid id, string status);
     }

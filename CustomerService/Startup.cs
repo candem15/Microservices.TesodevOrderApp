@@ -19,25 +19,36 @@ namespace CustomerService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            _environment = environment;
         }
 
         public IConfiguration Configuration { get; }
 
+        private readonly IWebHostEnvironment _environment;
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Console.WriteLine("--> Sql Server using...");
+            if (_environment.IsDevelopment())
+            {
+                Console.WriteLine("--> Local MSSql Server using...");
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("CustomerServiceSqlConnection")));
+            }
+            if (_environment.IsProduction())
+            {
+                Console.WriteLine("--> K8S MSSql Server using...");
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("CustomerServiceSqlConnectionK8S")));
+            }
+            services.AddScoped<ICustomerRepo, CustomerRepo>();
 
-            services.AddScoped<ICustomerRepo,CustomerRepo>();
+            services.AddHttpClient<IOrderDataClient, HttpOrderDataClient>();
 
-            services.AddHttpClient<IOrderDataClient,HttpOrderDataClient>();
-
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSwaggerGen(c =>
             {
@@ -67,6 +78,8 @@ namespace CustomerService
             {
                 endpoints.MapControllers();
             });
+
+            PrepDb.Migrations(app, _environment.IsProduction());
         }
     }
 }

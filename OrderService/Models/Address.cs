@@ -8,7 +8,7 @@ namespace OrderService.Models
     {
         [Key]
         [Required]
-        public Guid AddressesId { get; set; }
+        public Guid Id { get; set; }
         public string AddressLine { get; set; }
         [Required]
         public string City { get; set; }

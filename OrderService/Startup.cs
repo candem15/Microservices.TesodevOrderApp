@@ -19,19 +19,31 @@ namespace OrderService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration,IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            _environment=environment;
         }
 
         public IConfiguration Configuration { get; }
 
+        private readonly IWebHostEnvironment _environment;
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-             Console.WriteLine("--> Sql Server using...");
+            if (_environment.IsDevelopment())
+            {
+                Console.WriteLine("--> Local MSSql Server using...");
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("OrderServiceSqlConnection")));
+            }
+            if (_environment.IsProduction())
+            {
+                Console.WriteLine("--> K8S MSSql Server using...");
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("OrderServiceSqlConnectionK8S")));
+            }
 
             services.AddScoped<IOrderRepo,OrderRepo>();
 
@@ -64,6 +76,8 @@ namespace OrderService
             {
                 endpoints.MapControllers();
             });
+
+            PrepDb.Migrations(app, _environment.IsProduction());
         }
     }
 }

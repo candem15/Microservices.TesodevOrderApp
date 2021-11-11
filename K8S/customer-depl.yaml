@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customerservice
+  template:
+    metadata:
+      labels:
+        app: customerservice
+    spec:
+      containers:
+        - name: customerservice
+          image: candem16/customerservice:latest

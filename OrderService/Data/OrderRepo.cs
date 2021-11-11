@@ -83,7 +83,7 @@ namespace OrderService.Data
             return (_context.SaveChanges() >= 0);
         }
 
-        public bool UpdateOrder(Order order, Product? product)
+        public bool UpdateOrder(Order order)
         {
             if (_context.Orders.FirstOrDefault(p => p.Id == order.Id) == null)
             {
@@ -91,9 +91,15 @@ namespace OrderService.Data
                 return false;
             }
             _context.Orders.Update(order);
-            if (product != null)
+            if (order.Product != null)
             {
-                _context.Products.Update(product);
+                order.Product.Id = order.ProductId;
+                _context.Products.Update(order.Product);
+            }
+             if (order.Address != null)
+            {
+                order.Address.Id = order.AddressId;
+                _context.Addresses.Update(order.Address);
             }
             SaveChanges();
             Console.WriteLine($"--> Order updated successfully with Id:{order.Id}");

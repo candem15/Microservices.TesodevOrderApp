@@ -20,9 +20,11 @@ namespace OrderService.Models
         [Required]
         public string Status { get; set; }
         [Required]
-        public Address Addresses { get; set; }
+        public Address Address { get; set; }
+        public Guid AddressId { get; set; }
         [Required]
-        public Product Products { get; set; }
+        public Product Product { get; set; }
+        public Guid ProductId { get; set; }
         [Required]
         public DateTime CreatedAt { get; set; }
         [Required]

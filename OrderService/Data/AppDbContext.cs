@@ -20,31 +20,20 @@ namespace OrderService.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .Entity<Order>()
-                .HasOne(p => p.Addresses)
-                .WithMany(b => b.Order);
-            modelBuilder
                 .Entity<Address>()
-                .HasMany(p => p.Order)
-                .WithOne(b => b.Addresses);
+                .HasMany<Order>(p => p.Order)
+                .WithOne(b => b.Address)
+                .HasForeignKey(p=>p.AddressId);
             modelBuilder
                 .Entity<Customer>()
-                .HasMany(p => p.Orders)
+                .HasMany<Order>(p => p.Orders)
                 .WithOne(b => b.Customer)
                 .HasForeignKey(p=>p.CustomerId);
             modelBuilder
-                .Entity<Order>()
-                .HasOne(p => p.Customer)
-                .WithMany(b => b.Orders)
-                .HasForeignKey(p=>p.CustomerId);
-            modelBuilder
-                .Entity<Order>()
-                .HasOne(p => p.Products)
-                .WithMany(b => b.Order);
-            modelBuilder
                 .Entity<Product>()
-                .HasMany(p => p.Order)
-                .WithOne(b => b.Products);
+                .HasMany<Order>(p => p.Orders)
+                .WithOne(b => b.Product)
+                .HasForeignKey(p=>p.ProductId);
         }
     }
 }

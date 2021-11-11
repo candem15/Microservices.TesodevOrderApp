@@ -18,8 +18,8 @@ namespace OrderService.Dtos
         [Required]
         public string Status { get; set; }
         [Required]
-        public Address Addresses { get; set; }
+        public Address Address { get; set; }
         [Required]
-        public Product Products { get; set; }
+        public Product Product { get; set; }
     }
 }

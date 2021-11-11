@@ -15,6 +15,7 @@ namespace CustomerService.Models
         public string Country { get; set; }
         [Required]
         public int CityCode { get; set; }
-        public Customer Customer{get;set;}
+        public Guid CustomerId { get; set; }
+        public Customer Customer { get; set; }
     }
 }
