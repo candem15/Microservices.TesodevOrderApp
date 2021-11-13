@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CustomerService.Data;
@@ -31,7 +32,7 @@ namespace CustomerService.Controllers
 
             var customers = _repository.GetAllCustomers();
 
-            return Ok(_mapper.Map<IEnumerable<CustomerReadDto>>(customers));
+            return (_mapper.Map<IEnumerable<CustomerReadDto>>(customers).ToList());
         }
 
         [HttpGet("{id}", Name = "GetCustomerById")]
@@ -43,8 +44,7 @@ namespace CustomerService.Controllers
 
             if (customer == null)
                 return NotFound();
-
-            return Ok(_mapper.Map<CustomerReadDto>(customer));
+            return _mapper.Map<CustomerReadDto>(customer);
         }
 
         [HttpPost]
