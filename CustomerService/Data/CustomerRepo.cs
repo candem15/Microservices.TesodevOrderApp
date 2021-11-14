@@ -23,8 +23,6 @@ namespace CustomerService.Data
                 Console.WriteLine($"--> Customer could not created : {nullException}");
                 return Guid.Empty;
             }
-            customer.CreatedAt=DateTime.Now;
-            customer.UpdatedAt=DateTime.Now;
             _context.Customers.Add(customer);
             _context.Addresses.AddRange(customer.Addresses);
             SaveChanges();

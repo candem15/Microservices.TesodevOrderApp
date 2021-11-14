@@ -40,8 +40,6 @@ namespace OrderService.Data
                 Console.WriteLine($"--> Order could not created : {nullException}");
                 return Guid.Empty;
             }
-            order.CreatedAt = DateTime.Now;
-            order.UpdatedAt = DateTime.Now;
             _context.Orders.Add(order);
             SaveChanges();
             Console.WriteLine($"--> Order created successfully with given Id:{order.Id}");

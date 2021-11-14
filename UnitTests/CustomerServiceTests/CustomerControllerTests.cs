@@ -19,7 +19,6 @@ namespace UnitTests.CustomerServiceTests
     public class ItemsControllerTests
     {
         private readonly Mock<ICustomerRepo> repositoryStub = new();
-        private readonly Mock<ILogger<CustomerController>> loggerStub = new();
         private readonly Mock<IOrderDataClient> orderDataClientStub = new();
         private IMapper mapperObject()
         {
@@ -65,11 +64,12 @@ namespace UnitTests.CustomerServiceTests
 
             //Act
 
-            var result = controller.GetCustomerById(Guid.NewGuid()).Value;
+            var result = controller.GetCustomerById(Guid.NewGuid());
 
             //Assert
 
-            result.Should().BeEquivalentTo(expectedCustomer);
+            var resultObject = (result.Result as OkObjectResult).Value as CustomerReadDto;
+            resultObject.Should().BeEquivalentTo(expectedCustomer);
 
         }
 
@@ -87,94 +87,109 @@ namespace UnitTests.CustomerServiceTests
 
             //Act
 
-            var result = controller.GetAllCustomers().Value;
+            var result = controller.GetAllCustomers();
 
             //Assert
 
-            result.Should().BeEquivalentTo(expectedCustomers);
+            var resultObjects = (result.Result as OkObjectResult).Value as IEnumerable<CustomerReadDto>;
+            resultObjects.Should().BeEquivalentTo(expectedCustomers);
 
         }
 
-        [Fact] // STILL IN PROGRESSSSSS!!!
+        [Fact]
         public void CreateCustomer_WithCustomerToCreate_ReturnsCreatedCustomer()
         {
             //Arrange
 
             var customerToCreate = CreateRandomCustomer();
-            var customerCreateModel = new CustomerCreateDto {
+            var customerCreateModel = new CustomerCreateDto
+            {
                 Name = customerToCreate.Name,
                 Email = customerToCreate.Email,
                 Addresses = customerToCreate.Addresses
-                };
-            repositoryStub.Setup(repo => repo.CreateCustomer(customerToCreate)).Returns(customerToCreate.Id);
+            };
+            repositoryStub.Setup(repo => repo.CreateCustomer(customerToCreate)).Returns(Guid.NewGuid());
             var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
 
             //Act
 
-            var result = controller.CreateCustomer(customerCreateModel).Result.Value;
+            var result = controller.CreateCustomer(customerCreateModel).Result;
 
             //Assert
 
             var createdCustomer = (result.Result as CreatedAtRouteResult).Value as CustomerReadDto;
             customerToCreate.Should().BeEquivalentTo(
                 createdCustomer,
-                options => options.ComparingByMembers<Customer>().ExcludingMissingMembers() //"ItemDto" at Catalog.Api has 4 properties but "itemToCreate" got only 2. Because of that added additional filter for comparing without missing members.
+                options => options.ComparingByMembers<Customer>()
+                    .Excluding(p => p.Id)
+                    .Excluding(p => p.CreatedAt)
+                    .Excluding(p => p.UpdatedAt)
                 );
-            createdCustomer.Id.Should().NotBeEmpty();
             createdCustomer.CreatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(1000));
             createdCustomer.UpdatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(1000));
         }
-        /*
-                                [Fact]
-                                public async Task UpdateItemAsync_WithExistingItem_ReturnsNoContent()
-                                {
-                                    //Arrange
 
-                                    Item existingItem = CreateRandomItem();
-                                    repositoryStub.Setup(repo => repo.GetItemAsync(It.IsAny<Guid>()))
-                                        .ReturnsAsync(existingItem);
+        [Fact]
+        public void UpdateCustomer_WithExistingCustomer_ReturnsNoContent()
+        {
+            //Arrange
 
-                                    var itemId = existingItem.Id; // We took existingItem's id for update.
-                                    var itemToUpdate = new UpdateItemDto( //Here we give new values to properties for simulate updating item.
-                                        Guid.NewGuid().ToString(),
-                                        rand.Next(1000),
-                                        Guid.NewGuid().ToString());
+            Customer existingCustomer = CreateRandomCustomer();
+            repositoryStub.Setup(repo => repo.GetCustomerById(It.IsAny<Guid>()).Equals(true));
 
-                                    var controller = new ItemsController(repositoryStub.Object, loggerStub.Object);
+            var customerId = existingCustomer.Id; // We took existingCustomer's id for update.
+            var customerToUpdate = new CustomerUpdateDto()
+            { //Here we give new values to properties for simulate updating customer.
+                Name = Guid.NewGuid().ToString(),
+                Email = Guid.NewGuid().ToString(),
+                Addresses = new Address()
+                {
+                    Id = Guid.NewGuid(),
+                    AddressLine = Guid.NewGuid().ToString(),
+                    City = Guid.NewGuid().ToString(),
+                    Country = Guid.NewGuid().ToString(),
+                    CityCode = 42
+                }
+            };
 
-                                    //Act
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
 
-                                    var result = await controller.UpdateItemAsync(itemId, itemToUpdate);
+            //Act
 
-                                    //Assert
+            var result = controller.UpdateCustomer(customerId, customerToUpdate);
 
-                                    result.Should().BeOfType<NoContentResult>();
+            //Assert
 
-                                }
+            result.Should().BeOfType<NoContentResult>();
 
-                                [Fact]
-                                public async Task DeleteItemAsync_WithExistingItem_ReturnsNoContent()
-                                {
-                                    //Arrange
+        }
 
-                                    Item existingItem = CreateRandomItem();
-                                    repositoryStub.Setup(repo => repo.GetItemAsync(It.IsAny<Guid>()))
-                                        .ReturnsAsync(existingItem);
+        [Fact]
+        public void DeleteCustomer_WithExistingCustomer_ReturnsNoContent()
+        {
+            //Arrange
 
-                                    var itemId = existingItem.Id; // We took existingItem's id for delete.
+            Customer existingCustomer= CreateRandomCustomer();
+            repositoryStub.Setup(repo => repo.GetCustomerById(It.IsAny<Guid>()))
+                .Returns(existingCustomer);
+            repositoryStub.Setup(repo => repo.ValidateCustomer(It.IsAny<Guid>()))
+                .Returns(true);
+            repositoryStub.Setup(repo => repo.DeleteCustomer(It.IsAny<Guid>()))
+                .Returns(true);
+            var customerId = existingCustomer.Id;
 
-                                    var controller = new ItemsController(repositoryStub.Object, loggerStub.Object);
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
 
-                                    //Act
+            //Act
 
-                                    var result = await controller.DeleteItemAsync(itemId);
+            var result = controller.DeleteCustomer(customerId);
 
-                                    //Assert
+            //Assert
 
-                                    result.Should().BeOfType<NoContentResult>();
+            result.Should().BeOfType<NoContentResult>();
 
-                                }
-                        */
+        }
+
         private Customer CreateRandomCustomer()
         {
             return new() //We don't care about much what are the values of properties. But we have to give values right type and range like actual "Customer".
@@ -202,5 +217,3 @@ namespace UnitTests.CustomerServiceTests
         }
     }
 }
-//There is extension to visualize the overall status of our test suite. Like, which case is passing, which words are failing and so on. To do that we added ".NET Core Test Explorer" extension. Then click gear icon and go extension settings, switch to workspace section from user and find "dotnet-test-explorer:Test project path" and write inside of it => "**/*Tests.csproj".
-//Added "dotnet add package FluentAssertions" library to Catalog.UnitTests project. In our case this library will helps us compare existingItem and itemDto without code repeat.

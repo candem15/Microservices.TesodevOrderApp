@@ -14,7 +14,7 @@ namespace OrderService.Dtos
         public int Quantity { get; set; }
         public double Price { get; set; }
         public string Status { get; set; }
-        public Address Addres { get; set; }
+        public Address Address { get; set; }
         public Product Product { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

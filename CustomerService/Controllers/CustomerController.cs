@@ -32,7 +32,7 @@ namespace CustomerService.Controllers
 
             var customers = _repository.GetAllCustomers();
 
-            return (_mapper.Map<IEnumerable<CustomerReadDto>>(customers).ToList());
+            return Ok(_mapper.Map<IEnumerable<CustomerReadDto>>(customers));
         }
 
         [HttpGet("{id}", Name = "GetCustomerById")]
@@ -44,13 +44,15 @@ namespace CustomerService.Controllers
 
             if (customer == null)
                 return NotFound();
-            return _mapper.Map<CustomerReadDto>(customer);
+            return Ok(_mapper.Map<CustomerReadDto>(customer));
         }
 
         [HttpPost]
         public async Task<ActionResult<CustomerReadDto>> CreateCustomer(CustomerCreateDto customerCreateDto)
         {
             var customerModel = _mapper.Map<Customer>(customerCreateDto);
+            customerModel.CreatedAt=DateTime.Now;
+            customerModel.UpdatedAt=DateTime.Now;
             var customerId = _repository.CreateCustomer(customerModel);
             if (customerId != null)
                 Console.WriteLine($"--> New customer created with Id: {customerId}");

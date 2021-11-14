@@ -72,6 +72,8 @@ namespace OrderService.Controllers
         public ActionResult<OrderReadDto> CreateOrder(OrderCreateDto orderCreateDto)
         {
             var orderModel = _mapper.Map<Order>(orderCreateDto);
+            orderModel.CreatedAt = DateTime.Now;
+            orderModel.UpdatedAt = DateTime.Now;
             var orderId = _repository.CreateOrder(orderModel);
             if (orderId != null)
                 Console.WriteLine($"--> New order created with Id: {orderId}");
