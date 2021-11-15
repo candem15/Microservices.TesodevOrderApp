@@ -96,6 +96,32 @@ namespace UnitTests.OrderServiceTests
         }
 
         [Fact]
+        public void GetAllOrdersByCustomerId_WithExistingOrders_ReturnsMatchingOrders()
+        {
+            //Arrange
+
+            var order1 = CreateOrderByCustomerId();
+            var order2 = CreateOrderByCustomerId();
+            IEnumerable<Order> ordersDatabase = new[] { CreateRandomOrder(), order1, order2 };
+            IEnumerable<Order> expectedOrders = new[] { order1, order2 };
+            Guid customerIdToGetOrders = new Guid("8d207077-9e8b-4dbb-a30e-7bb2a2ac7893");
+            repositoryStub.Setup(repo => repo.GetAllOrdersByCustomerId(customerIdToGetOrders))
+                .Returns(ordersDatabase.Where(p => p.CustomerId == customerIdToGetOrders));
+
+            var controller = new OrderController(repositoryStub.Object, mapperObject());
+
+            //Act
+
+            var result = controller.GetAllOrdersByCustomerId(customerIdToGetOrders);
+
+            //Assert
+
+            var resultObjects = (result.Result as OkObjectResult).Value as IEnumerable<OrderReadDto>;
+            resultObjects.Should().BeEquivalentTo(expectedOrders, opt => opt.ComparingByMembers<Order>().ExcludingMissingMembers());
+
+        }
+
+        [Fact]
         public void CreateOrder_WithOrderToCreate_ReturnsCreatedOrder()
         {
             //Arrange
@@ -134,79 +160,114 @@ namespace UnitTests.OrderServiceTests
             var createdOrder = (result.Result as CreatedAtRouteResult).Value as OrderReadDto;
             orderToCreate.Should().BeEquivalentTo(
                 createdOrder,
-                options => options.ComparingByMembers<Order>().ExcludingMissingMembers().Excluding(p=>p.Id).Excluding(p=>p.CreatedAt).Excluding(p=>p.UpdatedAt)
+                options => options.ComparingByMembers<Order>().ExcludingMissingMembers().Excluding(p => p.Id).Excluding(p => p.CreatedAt).Excluding(p => p.UpdatedAt)
                 );
             createdOrder.CreatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(1000));
             createdOrder.UpdatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(1000));
         }
-        /* InProgresss
-                                [Fact]
-                                public void UpdateCustomer_WithExistingCustomer_ReturnsNoContent()
-                                {
-                                    //Arrange
 
-                                    Customer existingCustomer = CreateRandomCustomer();
-                                    repositoryStub.Setup(repo => repo.GetCustomerById(It.IsAny<Guid>()).Equals(true));
+        [Fact]
+        public void UpdateOrder_WithExistingOrder_ReturnsNoContent()
+        {
+            //Arrange
 
-                                    var customerId = existingCustomer.Id; // We took existingCustomer's id for update.
-                                    var customerToUpdate = new CustomerUpdateDto()
-                                    { //Here we give new values to properties for simulate updating customer.
-                                        Name = Guid.NewGuid().ToString(),
-                                        Email = Guid.NewGuid().ToString(),
-                                        Addresses = new Address()
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            AddressLine = Guid.NewGuid().ToString(),
-                                            City = Guid.NewGuid().ToString(),
-                                            Country = Guid.NewGuid().ToString(),
-                                            CityCode = 42
-                                        }
-                                    };
+            Order existingOrder = CreateRandomOrder();
+            repositoryStub.Setup(repo => repo.GetOrderById(It.IsAny<Guid>()).Equals(true));
 
-                                    var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
+            var orderId = existingOrder.Id;
+            var orderToUpdate = new OrderUpdateDto()
+            {
+                CustomerId = Guid.NewGuid(),
+                Address = new Address()
+                {
+                    Id = Guid.NewGuid(),
+                    AddressLine = Guid.NewGuid().ToString(),
+                    City = Guid.NewGuid().ToString(),
+                    Country = Guid.NewGuid().ToString(),
+                    CityCode = rand.Next(100)
+                },
+                Quantity = rand.Next(100),
+                Price = rand.Next(100),
+                Status = Guid.NewGuid().ToString(),
+                Product = new Product()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = Guid.NewGuid().ToString(),
+                    ImageUrl = Guid.NewGuid().ToString()
+                }
+            };
 
-                                    //Act
+            var controller = new OrderController(repositoryStub.Object, mapperObject());
 
-                                    var result = controller.UpdateCustomer(customerId, customerToUpdate);
+            //Act
 
-                                    //Assert
+            var result = controller.UpdateOrder(orderId, orderToUpdate);
 
-                                    result.Should().BeOfType<NoContentResult>();
+            //Assert
 
-                                }
+            result.Should().BeOfType<NoContentResult>();
 
-                                [Fact]
-                                public void DeleteCustomer_WithExistingCustomer_ReturnsNoContent()
-                                {
-                                    //Arrange
+        }
 
-                                    Customer existingCustomer = CreateRandomCustomer();
-                                    repositoryStub.Setup(repo => repo.GetCustomerById(It.IsAny<Guid>()))
-                                        .Returns(existingCustomer);
-                                    repositoryStub.Setup(repo => repo.ValidateCustomer(It.IsAny<Guid>()))
-                                        .Returns(true);
-                                    repositoryStub.Setup(repo => repo.DeleteCustomer(It.IsAny<Guid>()))
-                                        .Returns(true);
-                                    var customerId = existingCustomer.Id;
+        [Fact]
+        public void DeleteOrder_WithExistingOrder_ReturnsNoContent()
+        {
+            //Arrange
 
-                                    var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
+            Order existingOrder = CreateRandomOrder();
+            var orderId = existingOrder.Id;
 
-                                    //Act
+            repositoryStub.Setup(repo => repo.GetOrderById(orderId))
+                .Returns(existingOrder);
+            repositoryStub.Setup(repo => repo.DeleteOrder(It.IsAny<Guid>()))
+                .Returns(true);
 
-                                    var result = controller.DeleteCustomer(customerId);
+            var controller = new OrderController(repositoryStub.Object, mapperObject());
 
-                                    //Assert
+            //Act
 
-                                    result.Should().BeOfType<NoContentResult>();
+            var result = controller.DeleteOrder(orderId);
 
-                                }
-                        */
+            //Assert
+
+            result.Should().BeOfType<NoContentResult>();
+
+        }
+
         private Order CreateRandomOrder()
         {
-            return new() //We don't care about much what are the values of properties. But we have to give values right type and range like actual "Customer".
+            return new()
             {
                 Id = Guid.NewGuid(),
                 CustomerId = Guid.NewGuid(),
+                Address = new Address()
+                {
+                    Id = Guid.NewGuid(),
+                    AddressLine = Guid.NewGuid().ToString(),
+                    City = Guid.NewGuid().ToString(),
+                    Country = Guid.NewGuid().ToString(),
+                    CityCode = 42
+                },
+                Quantity = rand.Next(1000),
+                Price = Convert.ToDouble(rand.Next(1000)),
+                Status = Guid.NewGuid().ToString(),
+                Product = new Product()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = Guid.NewGuid().ToString(),
+                    ImageUrl = Guid.NewGuid().ToString()
+                },
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+        }
+
+        private Order CreateOrderByCustomerId()
+        {
+            return new()
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = new Guid("8d207077-9e8b-4dbb-a30e-7bb2a2ac7893"),
                 Address = new Address()
                 {
                     Id = Guid.NewGuid(),

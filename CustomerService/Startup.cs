@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CustomerService.AsyncDataServices;
 using CustomerService.Data;
 using CustomerService.SyncDataServices.Http;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +48,7 @@ namespace CustomerService
             services.AddScoped<ICustomerRepo, CustomerRepo>();
 
             services.AddHttpClient<IOrderDataClient, HttpOrderDataClient>();
+            services.AddSingleton<IMessageBusClient,MessageBusClient>();
 
             services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

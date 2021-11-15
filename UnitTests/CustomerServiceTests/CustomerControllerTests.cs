@@ -39,7 +39,7 @@ namespace UnitTests.CustomerServiceTests
             repositoryStub.Setup(repo => repo.GetCustomerById(It.IsAny<Guid>()))
                 .Returns((Customer)null);
 
-            var controller = new CustomerController(repositoryStub.Object, null, null);
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object, null);
 
             //Act => In this section we execute the test.
 
@@ -60,7 +60,7 @@ namespace UnitTests.CustomerServiceTests
             repositoryStub.Setup(repo => repo.GetCustomerById(It.IsAny<Guid>()))
                 .Returns(expectedCustomer);
 
-            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object, null);
 
             //Act
 
@@ -83,7 +83,7 @@ namespace UnitTests.CustomerServiceTests
             repositoryStub.Setup(repo => repo.GetAllCustomers())
                 .Returns(expectedCustomers);
 
-            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object, null);
 
             //Act
 
@@ -109,7 +109,7 @@ namespace UnitTests.CustomerServiceTests
                 Addresses = customerToCreate.Addresses
             };
             repositoryStub.Setup(repo => repo.CreateCustomer(customerToCreate)).Returns(Guid.NewGuid());
-            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object, null);
 
             //Act
 
@@ -152,7 +152,7 @@ namespace UnitTests.CustomerServiceTests
                 }
             };
 
-            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object, null);
 
             //Act
 
@@ -169,7 +169,7 @@ namespace UnitTests.CustomerServiceTests
         {
             //Arrange
 
-            Customer existingCustomer= CreateRandomCustomer();
+            Customer existingCustomer = CreateRandomCustomer();
             repositoryStub.Setup(repo => repo.GetCustomerById(It.IsAny<Guid>()))
                 .Returns(existingCustomer);
             repositoryStub.Setup(repo => repo.ValidateCustomer(It.IsAny<Guid>()))
@@ -178,7 +178,7 @@ namespace UnitTests.CustomerServiceTests
                 .Returns(true);
             var customerId = existingCustomer.Id;
 
-            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object);
+            var controller = new CustomerController(repositoryStub.Object, mapperObject(), orderDataClientStub.Object, null);
 
             //Act
 

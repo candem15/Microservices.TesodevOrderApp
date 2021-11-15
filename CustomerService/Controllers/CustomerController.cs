@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CustomerService.AsyncDataServices;
 using CustomerService.Data;
 using CustomerService.Dtos;
 using CustomerService.Models;
@@ -17,12 +18,14 @@ namespace CustomerService.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IOrderDataClient _orderDataClient;
+        private readonly IMessageBusClient _messageBusClient;
         private readonly ICustomerRepo _repository;
-        public CustomerController(ICustomerRepo repository, IMapper mapper, IOrderDataClient orderDataClient)
+        public CustomerController(ICustomerRepo repository, IMapper mapper, IOrderDataClient orderDataClient, IMessageBusClient messageBusClient)
         {
             _repository = repository;
             _mapper = mapper;
             _orderDataClient = orderDataClient;
+            _messageBusClient=messageBusClient;
         }
 
         [HttpGet]
@@ -58,6 +61,7 @@ namespace CustomerService.Controllers
                 Console.WriteLine($"--> New customer created with Id: {customerId}");
             var customerReadDto = _mapper.Map<CustomerReadDto>(customerModel);
 
+            // Sync message sending
             try
             {
                 await _orderDataClient.SendCustomerToOrder(customerReadDto);
@@ -65,6 +69,18 @@ namespace CustomerService.Controllers
             catch (Exception exception)
             {
                 Console.WriteLine($"--> Could not send synchronously: {exception.Message}");
+            }
+
+            // ASync message sending
+            try
+            {
+                var customerPublishedDto = _mapper.Map<CustomerPublishedDto>(customerReadDto);
+                customerPublishedDto.Event = "Customer_Published";
+                _messageBusClient.PublishNewCustomer(customerPublishedDto);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"--> Could not send asynchronously: {exception.Message}");
             }
 
             return CreatedAtRoute(nameof(GetCustomerById), new { Id = customerReadDto.Id }, customerReadDto); //This returns "201" with body payload of platformReadDto and Id as response.

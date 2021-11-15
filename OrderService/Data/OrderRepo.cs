@@ -32,6 +32,19 @@ namespace OrderService.Data
             return true;
         }
 
+        public void CreateCustomer(Customer customer)
+        {
+            if (customer == null)
+            {
+                string nullException = new ArgumentNullException(nameof(customer)).ToString();
+                Console.WriteLine($"--> Order could not created : {nullException}");
+            }
+            _context.Customers.Add(customer);
+            SaveChanges();
+
+            Console.WriteLine($"--> Customer created successfully with given Id:{customer.Id}");
+        }
+
         public Guid CreateOrder(Order order)
         {
             if (order == null)
@@ -59,6 +72,11 @@ namespace OrderService.Data
 
             Console.WriteLine($"--> Order deleted successfuly with Id:{id}");
             return true;
+        }
+
+        public bool ExternalCustomerExists(Guid externalCustomerId)
+        {
+            return _context.Customers.Any(p => p.ExternalID == externalCustomerId);
         }
 
         public IEnumerable<Order> GetAllOrders()
@@ -94,7 +112,7 @@ namespace OrderService.Data
                 order.Product.Id = order.ProductId;
                 _context.Products.Update(order.Product);
             }
-             if (order.Address != null)
+            if (order.Address != null)
             {
                 order.Address.Id = order.AddressId;
                 _context.Addresses.Update(order.Address);

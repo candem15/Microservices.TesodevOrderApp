@@ -14,15 +14,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using OrderService.Data;
+using OrderService.EventProcessing;
 
 namespace OrderService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration,IWebHostEnvironment environment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
-            _environment=environment;
+            _environment = environment;
         }
 
         public IConfiguration Configuration { get; }
@@ -45,11 +46,11 @@ namespace OrderService
                     options.UseSqlServer(Configuration.GetConnectionString("OrderServiceSqlConnectionK8S")));
             }
 
-            services.AddScoped<IOrderRepo,OrderRepo>();
+            services.AddScoped<IOrderRepo, OrderRepo>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-            services.AddControllers().AddNewtonsoftJson(opt=>opt.SerializerSettings.ReferenceLoopHandling=ReferenceLoopHandling.Ignore);
+            services.AddSingleton<IEventProcessor, EventProcessor>();
+            services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OrderService", Version = "v1" });
