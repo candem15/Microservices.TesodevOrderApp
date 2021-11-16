@@ -16,6 +16,7 @@ namespace OrderService.Models
         public string Country { get; set; }
         [Required]
         public int CityCode { get; set; }
+        public Guid CustomerId { get; set; }
         public Customer Customer { get; set; }
         public ICollection<Order> Order { get; set; } = new List<Order>();
     }

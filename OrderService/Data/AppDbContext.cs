@@ -34,6 +34,12 @@ namespace OrderService.Data
                 .HasMany<Order>(p => p.Orders)
                 .WithOne(b => b.Product)
                 .HasForeignKey(p=>p.ProductId);
+            modelBuilder
+                .Entity<Address>()
+                .HasOne<Customer>(p => p.Customer)
+                .WithMany(b => b.Addresses)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasForeignKey(p=>p.CustomerId);
         }
     }
 }

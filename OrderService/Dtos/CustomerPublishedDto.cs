@@ -11,6 +11,7 @@ namespace OrderService.Dtos
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Event { get; set; }
+        public string Email { get; set; }
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
 }

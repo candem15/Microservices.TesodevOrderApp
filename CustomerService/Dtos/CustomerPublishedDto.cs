@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CustomerService.Models;
 
 namespace CustomerService.Dtos
@@ -11,6 +9,7 @@ namespace CustomerService.Dtos
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Event { get; set; }
-        public ICollection<Address> Addresses { get; set; } = new List<Address>();
+        public string Email { get; set; }
+         public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
 }

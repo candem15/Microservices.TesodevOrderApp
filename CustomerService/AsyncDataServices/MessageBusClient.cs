@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CustomerService.Dtos;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 
 namespace CustomerService.AsyncDataServices
@@ -45,7 +46,7 @@ namespace CustomerService.AsyncDataServices
 
         public void PublishNewCustomer(CustomerPublishedDto customerPublishedDto)
         {
-            var message = JsonSerializer.Serialize(customerPublishedDto);
+            var message = JsonConvert.SerializeObject(customerPublishedDto);
 
             if (_connection.IsOpen)
             {

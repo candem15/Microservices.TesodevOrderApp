@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 
 namespace CustomerService
 {
@@ -48,8 +49,11 @@ namespace CustomerService
             services.AddScoped<ICustomerRepo, CustomerRepo>();
 
             services.AddHttpClient<IOrderDataClient, HttpOrderDataClient>();
-            services.AddSingleton<IMessageBusClient,MessageBusClient>();
-
+            services.AddSingleton<IMessageBusClient, MessageBusClient>();
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
             services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSwaggerGen(c =>

@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using OrderService.Data;
 using OrderService.Dtos;
 using OrderService.Models;
@@ -28,6 +29,7 @@ namespace OrderService.EventProcessing
             switch (eventType)
             {
                 case EventType.CustomerPublished:
+                    addCustomer(message);
                     break;
                 default:
                     break;
@@ -38,7 +40,7 @@ namespace OrderService.EventProcessing
         {
             Console.WriteLine("--> Determining Event");
 
-            var eventType = JsonSerializer.Deserialize<GenericEventDto>(notificationMessage);
+            var eventType = JsonConvert.DeserializeObject<GenericEventDto>(notificationMessage);
 
             switch (eventType.Event)
             {
@@ -56,7 +58,7 @@ namespace OrderService.EventProcessing
             {
                 var repo = scope.ServiceProvider.GetRequiredService<IOrderRepo>();
 
-                var customerPublishedDto = JsonSerializer.Deserialize<CustomerPublishedDto>(customerPublishedMessage);
+                var customerPublishedDto = JsonConvert.DeserializeObject<CustomerPublishedDto>(customerPublishedMessage);
 
                 try
                 {
@@ -64,6 +66,7 @@ namespace OrderService.EventProcessing
                     if (!repo.ExternalCustomerExists(customer.ExternalID))
                     {
                         repo.CreateCustomer(customer);
+                        Console.WriteLine("--> Customer added!");
                     }
                     else
                     {
