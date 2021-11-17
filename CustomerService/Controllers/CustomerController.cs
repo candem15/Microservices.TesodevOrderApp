@@ -19,8 +19,8 @@ namespace CustomerService.Controllers
         private readonly IMapper _mapper;
         private readonly IOrderDataClient _orderDataClient;
         private readonly IMessageBusClient _messageBusClient;
-        private readonly ICustomerRepo _repository;
-        public CustomerController(ICustomerRepo repository, IMapper mapper, IOrderDataClient orderDataClient, IMessageBusClient messageBusClient)
+        private readonly ICustomerRepo<Customer> _repository;
+        public CustomerController(ICustomerRepo<Customer> repository, IMapper mapper, IOrderDataClient orderDataClient, IMessageBusClient messageBusClient)
         {
             _repository = repository;
             _mapper = mapper;

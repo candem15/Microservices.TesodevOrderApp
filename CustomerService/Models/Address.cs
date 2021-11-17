@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace CustomerService.Models
 {
@@ -16,6 +17,7 @@ namespace CustomerService.Models
         [Required]
         public int CityCode { get; set; }
         public Guid CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        [JsonIgnore]
+        public virtual Customer Customer { get; set; }
     }
 }

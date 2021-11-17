@@ -6,7 +6,7 @@ using CustomerService.Models;
 
 namespace CustomerService.Data
 {
-    public interface ICustomerRepo
+    public interface ICustomerRepo<T> where T:class
     {
         bool SaveChanges();
         IEnumerable<Customer> GetAllCustomers();

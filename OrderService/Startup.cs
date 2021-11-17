@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using OrderService.AsyncDataServices;
 using OrderService.Data;
 using OrderService.EventProcessing;
+using OrderService.SyncDataServices.Grpc;
 
 namespace OrderService
 {
@@ -53,7 +54,7 @@ namespace OrderService
             services.AddSingleton<IEventProcessor, EventProcessor>();
 
             services.AddHostedService<MessageBusSubscriber>();
-
+            services.AddScoped<ICustomerDataClient, CustomerDataClient>();
             services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
             {

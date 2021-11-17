@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using OrderService.Models;
+using OrderService.SyncDataServices.Grpc;
 
 namespace OrderService.Data
 {
@@ -14,7 +16,13 @@ namespace OrderService.Data
         {
             using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
             {
+                var grpcClient = serviceScope.ServiceProvider.GetService<ICustomerDataClient>();
+
+                var customers = grpcClient.ReturnAllCustomers();
+
                 ApplyMigrations(serviceScope.ServiceProvider.GetService<AppDbContext>(), isProduction);
+
+                SeedData(serviceScope.ServiceProvider.GetService<IOrderRepo>(), customers);
             }
         }
 
@@ -32,6 +40,20 @@ namespace OrderService.Data
                 {
                     Console.WriteLine($"--> Migrations could not applied: {ex.Message}");
                 }
+            }
+        }
+
+        private static void SeedData(IOrderRepo repo, IEnumerable<Customer> customers)
+        {
+            Console.WriteLine("--> Seeding new customers...");
+
+            foreach (var customer in customers)
+            {
+                if(!repo.ExternalCustomerExists(customer.ExternalID))
+                {
+                    repo.CreateCustomer(customer);
+                }
+                repo.SaveChanges();
             }
         }
     }

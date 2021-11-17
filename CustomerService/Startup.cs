@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CustomerService.AsyncDataServices;
 using CustomerService.Data;
+using CustomerService.Models;
+using CustomerService.SyncDataServices.Grpc;
 using CustomerService.SyncDataServices.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,10 +50,11 @@ namespace CustomerService
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("CustomerServiceSqlConnectionK8S")));
             }
-            services.AddScoped<ICustomerRepo, CustomerRepo>();
+            services.AddScoped<ICustomerRepo<Customer>, CustomerRepo<Customer>>();
 
             services.AddHttpClient<IOrderDataClient, HttpOrderDataClient>();
             services.AddSingleton<IMessageBusClient, MessageBusClient>();
+            services.AddGrpc();
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -83,6 +88,12 @@ namespace CustomerService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGrpcService<GrpcCustomerService>();
+
+                endpoints.MapGet("/Protos/customers.proto", async context =>
+                {
+                    await context.Response.WriteAsync(File.ReadAllText("Protos/customers.proto"));
+                });
             });
 
             PrepDb.Migrations(app, _environment.IsProduction());

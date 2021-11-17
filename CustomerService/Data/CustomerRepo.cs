@@ -7,7 +7,7 @@ using CustomerService.Models;
 
 namespace CustomerService.Data
 {
-    public class CustomerRepo : ICustomerRepo
+    public class CustomerRepo<T> : ICustomerRepo<T> where T : class
     {
         private readonly AppDbContext _context;
 
@@ -44,7 +44,12 @@ namespace CustomerService.Data
 
         public IEnumerable<Customer> GetAllCustomers()
         {
-            return _context.Customers.ToList();
+            var result = (from cust in _context.Customers.ToList()
+                          join adr in _context.Addresses.ToList()
+                          on cust.Id equals adr.CustomerId
+                          select cust).ToList();
+
+            return result;
         }
 
         public Customer GetCustomerById(Guid id)
@@ -70,9 +75,9 @@ namespace CustomerService.Data
                 return false;
             }
             _context.Customers.Update(customer);
-            if(address!=null)
+            if (address != null)
             {
-            _context.Addresses.Update(address);
+                _context.Addresses.Update(address);
             }
             SaveChanges();
             Console.WriteLine("--> Customer updated successfully!");
