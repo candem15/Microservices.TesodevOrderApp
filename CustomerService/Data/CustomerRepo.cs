@@ -47,14 +47,19 @@ namespace CustomerService.Data
             var result = (from cust in _context.Customers.ToList()
                           join adr in _context.Addresses.ToList()
                           on cust.Id equals adr.CustomerId
-                          select cust).ToList();
+                          select cust).Distinct().ToList();
 
             return result;
         }
 
         public Customer GetCustomerById(Guid id)
         {
-            return _context.Customers.FirstOrDefault(p => p.Id == id);
+             var result = (from cust in _context.Customers.ToList()
+                          join adr in _context.Addresses.ToList()
+                          on cust.Id equals adr.CustomerId
+                          select cust).FirstOrDefault(p => p.Id == id);
+
+            return result;
         }
 
         /* public IEnumerable<Address> GetAdressesByCustomerId(Guid id) ""Test purposes""

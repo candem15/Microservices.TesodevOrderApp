@@ -22,7 +22,7 @@ namespace OrderService.Data
 
                 ApplyMigrations(serviceScope.ServiceProvider.GetService<AppDbContext>(), isProduction);
 
-                SeedData(serviceScope.ServiceProvider.GetService<IOrderRepo>(), customers);
+                SeedData(serviceScope.ServiceProvider.GetService<IOrderRepo<Order>>(), customers);
             }
         }
 
@@ -43,17 +43,19 @@ namespace OrderService.Data
             }
         }
 
-        private static void SeedData(IOrderRepo repo, IEnumerable<Customer> customers)
+        private static void SeedData(IOrderRepo<Order> repo, IEnumerable<Customer> customers)
         {
-            Console.WriteLine("--> Seeding new customers...");
-
-            foreach (var customer in customers)
+            if (customers != null)
             {
-                if(!repo.ExternalCustomerExists(customer.ExternalID))
+                Console.WriteLine("--> Seeding new customers...");
+                foreach (var customer in customers)
                 {
-                    repo.CreateCustomer(customer);
+                    if (!repo.ExternalCustomerExists(customer.ExternalID))
+                    {
+                        repo.CreateCustomer(customer);
+                    }
+                    repo.SaveChanges();
                 }
-                repo.SaveChanges();
             }
         }
     }

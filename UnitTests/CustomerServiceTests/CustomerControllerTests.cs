@@ -18,7 +18,7 @@ namespace UnitTests.CustomerServiceTests
 {
     public class ItemsControllerTests
     {
-        private readonly Mock<ICustomerRepo> repositoryStub = new();
+        private readonly Mock<ICustomerRepo<Customer>> repositoryStub = new();
         private readonly Mock<IOrderDataClient> orderDataClientStub = new();
         private IMapper mapperObject()
         {

@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using OrderService.AsyncDataServices;
 using OrderService.Data;
 using OrderService.EventProcessing;
+using OrderService.Models;
 using OrderService.SyncDataServices.Grpc;
 
 namespace OrderService
@@ -48,7 +49,7 @@ namespace OrderService
                     options.UseSqlServer(Configuration.GetConnectionString("OrderServiceSqlConnectionK8S")));
             }
 
-            services.AddScoped<IOrderRepo, OrderRepo>();
+            services.AddScoped<IOrderRepo<Order>, OrderRepo<Order>>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSingleton<IEventProcessor, EventProcessor>();

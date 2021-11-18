@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace OrderService.Models
 {
@@ -17,7 +18,9 @@ namespace OrderService.Models
         [Required]
         public int CityCode { get; set; }
         public Guid CustomerId { get; set; }
+        [JsonIgnore]
         public Customer Customer { get; set; }
+        [JsonIgnore]
         public ICollection<Order> Order { get; set; } = new List<Order>();
     }
 }

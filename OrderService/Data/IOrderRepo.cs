@@ -6,7 +6,7 @@ using OrderService.Models;
 
 namespace OrderService.Data
 {
-    public interface IOrderRepo
+    public interface IOrderRepo<T>
     {
         bool SaveChanges();
         IEnumerable<Order> GetAllOrders();
