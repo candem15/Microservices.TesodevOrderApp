@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: tesodev.com
+      http:
+        paths:
+          - path: /api/customer
+            pathType: Prefix
+            backend:
+              service:
+                name: customer-clusterip-srv
+                port:
+                  number: 80
+          - path: /api/order
+            pathType: Prefix
+            backend:
+              service:
+                name: order-clusterip-srv
+                port:
+                  number: 80
+

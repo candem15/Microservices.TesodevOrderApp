@@ -15,3 +15,17 @@ spec:
       containers:
         - name: orderservice
           image: candem16/orderservice:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: orderservice
+  ports:
+  - name: orderservice
+    protocol: TCP
+    port: 80
+    targetPort: 80

@@ -6,7 +6,7 @@ using OrderService.Models;
 
 namespace OrderService.Data
 {
-    public class OrderRepo : IOrderRepo
+    public class OrderRepo<T> : IOrderRepo<T> where T : class
     {
         private readonly AppDbContext _context;
 
@@ -81,12 +81,22 @@ namespace OrderService.Data
 
         public IEnumerable<Order> GetAllOrders()
         {
-            return _context.Orders.ToList();
+            var result = (from ord in _context.Orders.ToList()
+                          join adr in _context.Addresses.ToList() on ord.AddressId equals adr.Id
+                          join pro in _context.Products.ToList() on ord.ProductId equals pro.Id
+                          select ord).ToList();
+
+            return result;
         }
 
         public IEnumerable<Order> GetAllOrdersByCustomerId(Guid id)
         {
-            return _context.Orders.Where(p => p.CustomerId == id).ToList();
+            var result = (from ord in _context.Orders.ToList()
+                          join adr in _context.Addresses.ToList() on ord.AddressId equals adr.Id
+                          join pro in _context.Products.ToList() on ord.ProductId equals pro.Id
+                          select ord).Where(p => p.CustomerId == id).ToList();
+
+            return result;
         }
 
         public Order GetOrderById(Guid id)

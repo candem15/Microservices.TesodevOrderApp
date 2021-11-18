@@ -17,7 +17,7 @@ namespace UnitTests.OrderServiceTests
 {
     public class OrderControllerTests
     {
-        private readonly Mock<IOrderRepo> repositoryStub = new();
+        private readonly Mock<IOrderRepo<Order>> repositoryStub = new();
         private readonly Random rand = new();
         private IMapper mapperObject()
         {

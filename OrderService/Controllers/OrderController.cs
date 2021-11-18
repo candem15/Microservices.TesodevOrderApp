@@ -15,10 +15,10 @@ namespace OrderService.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        private readonly IOrderRepo _repository;
+        private readonly IOrderRepo<Order> _repository;
         private readonly IMapper _mapper;
 
-        public OrderController(IOrderRepo repository, IMapper mapper)
+        public OrderController(IOrderRepo<Order> repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;

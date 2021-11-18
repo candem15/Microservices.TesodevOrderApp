@@ -56,7 +56,7 @@ namespace OrderService.EventProcessing
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var repo = scope.ServiceProvider.GetRequiredService<IOrderRepo>();
+                var repo = scope.ServiceProvider.GetRequiredService<IOrderRepo<Order>>();
 
                 var customerPublishedDto = JsonConvert.DeserializeObject<CustomerPublishedDto>(customerPublishedMessage);
 
