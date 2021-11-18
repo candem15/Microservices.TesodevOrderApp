@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
-using CustomerService;
+using CustomerService.Grpc;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
 using OrderService.Models;

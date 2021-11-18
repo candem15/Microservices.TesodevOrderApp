@@ -1,6 +1,6 @@
 syntax= "proto3";
 
-option csharp_namespace = "CustomerService";
+option csharp_namespace = "CustomerService.Grpc";
 
 service GrpcCustomer{
     rpc GetAllCustomers (GetAllRequests) returns (CustomerResponse){};
@@ -8,18 +8,19 @@ service GrpcCustomer{
 
 message GetAllRequests {}
 
+message Address {
+    string id = 1;
+    string addressLine = 2;
+    string city = 3;
+    string country = 4;
+    int32 cityCode = 5;
+    string customerId = 6;
+}
+
 message GrpcCustomerModel{
     string customerId = 1;
     string name = 2;
     string email = 3;
-    message Address {
-       optional string addressId = 1;
-       optional string addressLine = 2;
-       optional string city = 3;
-       optional string country = 4;
-       optional int32 cityCode = 5;
-       optional string customerId = 6;
-      }
     repeated Address addresses = 4;
 }
 

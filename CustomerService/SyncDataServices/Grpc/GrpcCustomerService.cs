@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using CustomerService.Data;
+using CustomerService.Grpc;
 using CustomerService.Models;
 using Grpc.Core;
 

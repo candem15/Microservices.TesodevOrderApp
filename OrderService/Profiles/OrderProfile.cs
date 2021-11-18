@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using CustomerService;
+using CustomerService.Grpc;
 using OrderService.Dtos;
 using OrderService.Models;
 
@@ -38,7 +34,7 @@ namespace OrderService.Profiles
                 .ForMember(
                     destinationMember=>destinationMember.Orders,
                     opt=>opt.Ignore());
+            CreateMap<CustomerService.Grpc.Address,Models.Address>();
          }
-
     }
 }
