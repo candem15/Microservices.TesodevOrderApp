@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using CustomerService.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomerService.Data
 {
@@ -54,19 +55,13 @@ namespace CustomerService.Data
 
         public Customer GetCustomerById(Guid id)
         {
-             var result = (from cust in _context.Customers.ToList()
+            var result = (from cust in _context.Customers.ToList()
                           join adr in _context.Addresses.ToList()
                           on cust.Id equals adr.CustomerId
                           select cust).FirstOrDefault(p => p.Id == id);
 
             return result;
         }
-
-        /* public IEnumerable<Address> GetAdressesByCustomerId(Guid id) ""Test purposes""
-        {
-            return _context.Addresses.Where(p => p.CustomerId == id).OrderBy(c=>c.City);
-        }
-        */
 
         public bool SaveChanges()
         {
@@ -79,11 +74,12 @@ namespace CustomerService.Data
             {
                 return false;
             }
+            ICollection<Address> newAddress = new List<Address>();
+            newAddress = customer.Addresses;
+            newAddress.Remove(_context.Addresses.FirstOrDefault(p=>p.Id==address.Id));
+            newAddress.Add(address);
+            customer.Addresses=newAddress;
             _context.Customers.Update(customer);
-            if (address != null)
-            {
-                _context.Addresses.Update(address);
-            }
             SaveChanges();
             Console.WriteLine("--> Customer updated successfully!");
             return true;

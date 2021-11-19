@@ -101,7 +101,12 @@ namespace OrderService.Data
 
         public Order GetOrderById(Guid id)
         {
-            return _context.Orders.FirstOrDefault(p => p.Id == id);
+            var result = (from ord in _context.Orders.ToList()
+                          join adr in _context.Addresses.ToList() on ord.AddressId equals adr.Id
+                          join pro in _context.Products.ToList() on ord.ProductId equals pro.Id
+                          select ord).FirstOrDefault(p => p.Id == id);
+
+            return result;
         }
 
         public bool SaveChanges()
@@ -117,16 +122,6 @@ namespace OrderService.Data
                 return false;
             }
             _context.Orders.Update(order);
-            if (order.Product != null)
-            {
-                order.Product.Id = order.ProductId;
-                _context.Products.Update(order.Product);
-            }
-            if (order.Address != null)
-            {
-                order.Address.Id = order.AddressId;
-                _context.Addresses.Update(order.Address);
-            }
             SaveChanges();
             Console.WriteLine($"--> Order updated successfully with Id:{order.Id}");
             return true;

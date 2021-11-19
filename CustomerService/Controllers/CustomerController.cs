@@ -108,7 +108,11 @@ namespace CustomerService.Controllers
             existingCustomer.UpdatedAt = DateTime.Now;
             if (customerUpdateDto.Addresses != null)
                 _repository.UpdateCustomer(existingCustomer, customerUpdateDto.Addresses);
-            _repository.UpdateCustomer(existingCustomer, null);
+            else
+            {
+                _repository.UpdateCustomer(existingCustomer, null);
+            }
+
             return NoContent();
         }
         /*[HttpGet("address/{id}", Name = "GetAdressesByCustomerId")] ""Test Purposes""
